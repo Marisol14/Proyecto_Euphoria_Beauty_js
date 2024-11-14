@@ -1,136 +1,175 @@
-//DAR LA BIENVENIDA A LOS USUARIOS A MI PÁGINA WEB.
-
-alert("Bienvenidos a Euphoria Beauty, su tienda de cosméticos.")
-
-console.log("Bienvenidos a Euphoria Beauty, su tienda de cosméticos.")
-
-//REGISTRARSE.
-let correoElectronico
-let contrasena
-let repetirContrasena
-
-function solicitarDatosParaRegistro() {
-    correoElectronico = prompt("Ingresa tu e-mail para registrarte:").toLowerCase()
-    contrasena = prompt("Crea una contraseña:").toLowerCase()
-    repetirContrasena = prompt("Repetir la contraseña:").toLowerCase()
-
-    if (contrasena === repetirContrasena) {
-        let mensaje ="Datos ingresados:\n" +
-                    "Correo electrónico: " + correoElectronico + "\n" +
-                    "Contraseña: " + contrasena + "\n" +
-                    "Repetir contraseña: " + repetirContrasena
-                    
-        alert(mensaje)        
-        console.log(mensaje) 
-    } else {
-        alert("Las contraseñas no coinciden. Inténtalo de nuevo.")
-        console.log("Las contraseñas no coinciden.")
-    }
-} 
-solicitarDatosParaRegistro();
-
-// INGRESAR A MI CUENTA.
-
-let ingresoDeCorreo = prompt("Ingresá tu e-mail:").toLowerCase()
-let ingresoDeContraseña = prompt ("Por favor, ingrese su contraseña")
-
-do {
-    if (contrasena !== ingresoDeContraseña) {
-        alert("Contraseña incorrecta. Inténtalo de nuevo.")
-    }
-}   while (contrasena !== ingresoDeContraseña)
-        alert("¡Has ingresado correctamente!")
-
-//PRODUCTOS DE EUPHORIA BEAUTY.
-class Producto {
-    constructor(id, nombre, precio) {
-        this.id = id;
-        this.nombre = nombre.toLowerCase();
-        this.precio = precio;
-    }
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ready);
+} else {
+    ready();
 }
 
-const productosDeMiTienda = [
-    new Producto(1, "Labial retráctil", 10000, "Labios"),
-    new Producto(2, "Labial líquido", 15000, "Labios"),
-    new Producto(3, "Labial", 20000, "Labios"),
-    new Producto(4, "Sombra de Ojos", 30000, "Ojos"),
-    new Producto(5, "Máscara de pestañas", 20000, "Ojos"),
-    new Producto(6, "Delineador", 10000, "Ojos"),
-    new Producto(7, "Base de Maquillaje", 25000, "Rostro"),
-    new Producto(8, "Corrector", 16000, "Rostro"),
-    new Producto(9, "Rubor", 16000, "Rostro"),
-];
-
-let carrito = [];
-function agregarAlCarrito(id) {
-    const producto = productosDeMiTienda.find(prod => prod.id === id);
-    if (producto) {
-        carrito.push(producto);
-        alert(`${producto.nombre} ha sido añadido al carrito.`);
-        console.log(`${producto.nombre} ha sido añadido al carrito.`);
-    } else {
-        alert('Producto no encontrado.');
-        console.log('Producto no encontrado.');
-    }
+function ready() {
+    cargarCarritoDesdeLocalStorage();
+    configurarEventosBotones();
 }
 
-function verCarrito() {
-    if (carrito.length === 0) {
-        alert("El carrito está vacío.");
-        console.log("El carrito está vacío.");
-    } else {
-        let mensajeCarrito = "Productos en el carrito:\n";
-        carrito.forEach((producto, index) => {
-            mensajeCarrito += `${index + 1}. ${producto.nombre} - $${producto.precio}\n`;
-        });
-        alert(mensajeCarrito);
-        console.log(mensajeCarrito);
+function configurarEventosBotones() {
+    var botonesEliminarItem = document.getElementsByClassName('btn-eliminar');
+    for (var boton of botonesEliminarItem) {
+        boton.addEventListener('click', eliminarItemCarrito);
     }
+    
+    var botonesSumarCantidad = document.getElementsByClassName('sumar-cantidad');
+    for (var boton of botonesSumarCantidad) {
+        boton.addEventListener('click', sumarCantidad);
+    }
+    
+    var botonesRestarCantidad = document.getElementsByClassName('restar-cantidad');
+    for (var boton of botonesRestarCantidad) {
+        boton.addEventListener('click', restarCantidad);
+    }
+    
+    var botonesAgregarAlCarrito = document.getElementsByClassName('boton-item');
+    for (var boton of botonesAgregarAlCarrito) {
+        boton.addEventListener('click', agregarAlCarritoClicked);
+    }
+
+    document.getElementsByClassName('btn-pagar')[0].addEventListener('click', pagarClicked);
 }
 
-function calcularTotal() {
-    let totalCarrito = 0;
-    for (let i = 0; i < carrito.length; i++) {
-        totalCarrito += carrito[i].precio;
+function pagarClicked() {
+    alert("Gracias por comprar en Euphoria Beauty!");
+    var carritoItems = document.getElementsByClassName('carrito-items')[0];
+    while (carritoItems.hasChildNodes()) {
+        carritoItems.removeChild(carritoItems.firstChild);
     }
-    alert(`Total a pagar: $${totalCarrito}`);
-    console.log(`Total a pagar: $${totalCarrito}`);
+    actualizarTotalCarrito();
+    ocultarCarrito();
+    guardarCarritoEnLocalStorage();
 }
 
-function tienda() {
-    let opcion;
-    do {
-        opcion = prompt("Bienvenido a la tienda. Elige una opción:\n1. Agregar producto al carrito\n2. Ver carrito\n3. Calcular total\n4. Salir");
-        
-        switch (opcion) {
-            case '1':
-                let idProducto = prompt("Ingrese el ID del producto que desea agregar:\n1. Labial retráctil - $10000\n2. Labial líquido - $15000\n3. Labial - $20000\n4. Sombra de Ojos - $30000\n5. Máscara de pestañas - $20000\n6. Delineador - $10000\n7. Base de Maquillaje - $25000\n8. Corrector - $16000\n9. Rubor - $16000");
-                agregarAlCarrito(parseInt(idProducto));
-                break;
-            case '2':
-                verCarrito();
-                break;
-            case '3':
-                calcularTotal();
-                break;
-            case '4':
-                alert("Gracias por comprar en Euphoria Beauty.");
-                console.log("Gracias por comprar en Euphoria Beauty.");
-                break;
-            default:
-                alert("Opción no válida.");
-                console.log("Opción no válida.");
+function agregarAlCarritoClicked(event) {
+    var item = event.target.parentElement;
+    var titulo = item.getElementsByClassName('titulo-item')[0].innerText;
+    var precio = item.getElementsByClassName('precio-item')[0].innerText;
+    var imagenSrc = item.getElementsByClassName('img-item')[0].src;
+    
+    agregarItemAlCarrito(titulo, precio, imagenSrc);
+    hacerVisibleCarrito();
+    guardarCarritoEnLocalStorage();
+}
+
+function agregarItemAlCarrito(titulo, precio, imagenSrc) {
+    var itemsCarrito = document.getElementsByClassName('carrito-items')[0];
+    var nombresItemsCarrito = itemsCarrito.getElementsByClassName('carrito-item-titulo');
+
+    for (var nombreItem of nombresItemsCarrito) {
+        if (nombreItem.innerText === titulo) {
+            alert("El item ya se encuentra en el carrito");
+            return;
         }
-    } while (opcion !== '4');
+    }
+
+    var itemCarritoContenido = `
+        <div class="carrito-item">
+            <img src="${imagenSrc}" width="80px" alt="">
+            <div class="carrito-item-detalles">
+                <span class="carrito-item-titulo">${titulo}</span>
+                <div class="selector-cantidad">
+                    <i class="fa-solid fa-minus restar-cantidad"></i>
+                    <input type="text" value="1" class="carrito-item-cantidad" disabled>
+                    <i class="fa-solid fa-plus sumar-cantidad"></i>
+                </div>
+                <span class="carrito-item-precio">${precio}</span>
+            </div>
+            <button class="btn-eliminar">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>
+    `;
+
+    var item = document.createElement('div');
+    item.innerHTML = itemCarritoContenido;
+    itemsCarrito.append(item);
+
+    item.getElementsByClassName('btn-eliminar')[0].addEventListener('click', eliminarItemCarrito);
+    item.getElementsByClassName('restar-cantidad')[0].addEventListener('click', restarCantidad);
+    item.getElementsByClassName('sumar-cantidad')[0].addEventListener('click', sumarCantidad);
+
+    actualizarTotalCarrito();
+    guardarCarritoEnLocalStorage();
 }
 
-tienda();
+function guardarCarritoEnLocalStorage() {
+    var carritoItems = document.getElementsByClassName('carrito-item');
+    var items = Array.from(carritoItems).map(item => {
+        var titulo = item.getElementsByClassName('carrito-item-titulo')[0].innerText;
+        var precio = item.getElementsByClassName('carrito-item-precio')[0].innerText;
+        var imagenSrc = item.getElementsByTagName('img')[0].src;
+        var cantidad = item.getElementsByClassName('carrito-item-cantidad')[0].value;
+        return { titulo, precio, imagenSrc, cantidad };
+    });
+    localStorage.setItem('carrito', JSON.stringify(items));
+}
 
-const productosLabios = productosDeMiTienda.filter(producto => producto.nombre.includes("labial"));
-const productosOjos = productosDeMiTienda.filter(producto => producto.nombre.includes("ojos") || producto.nombre.includes("máscara") || producto.nombre.includes("delineador"));
-const productosRostro = productosDeMiTienda.filter(producto => producto.nombre.includes("base") || producto.nombre.includes("corrector") || producto.nombre.includes("rubor"));
+function cargarCarritoDesdeLocalStorage() {
+    var items = JSON.parse(localStorage.getItem('carrito'));
+    if (items) {
+        items.forEach(item => {
+            agregarItemAlCarrito(item.titulo, item.precio, item.imagenSrc);
+            document.getElementsByClassName('carrito-item-cantidad')[document.getElementsByClassName('carrito-item-cantidad').length - 1].value = item.cantidad;
+        });
+        actualizarTotalCarrito();
+        hacerVisibleCarrito();
+    }
+}
 
-console.log("Productos de Labios:", productosLabios);
-console.log("Productos de Ojos:", productosOjos);
-console.log("Productos de Rostro:", productosRostro);
+function sumarCantidad(event) {
+    var cantidadActual = ++event.target.parentElement.getElementsByClassName('carrito-item-cantidad')[0].value;
+    actualizarTotalCarrito();
+    guardarCarritoEnLocalStorage();
+}
+
+function restarCantidad(event) {
+    var cantidadElemento = event.target.parentElement.getElementsByClassName('carrito-item-cantidad')[0];
+    var cantidadActual = --cantidadElemento.value;
+    if (cantidadActual < 1) cantidadElemento.value = 1;
+    actualizarTotalCarrito();
+    guardarCarritoEnLocalStorage();
+}
+
+function eliminarItemCarrito(event) {
+    event.target.parentElement.parentElement.remove();
+    actualizarTotalCarrito();
+    ocultarCarrito();
+    guardarCarritoEnLocalStorage();
+}
+
+function hacerVisibleCarrito() {
+    carritoVisible = true;
+    var carrito = document.getElementsByClassName('carrito')[0];
+    carrito.style.marginRight = '0';
+    carrito.style.opacity = '1';
+    document.getElementsByClassName('contenedor-items')[0].style.width = '60%';
+}
+
+function ocultarCarrito() {
+    var carritoItems = document.getElementsByClassName('carrito-items')[0];
+    if (carritoItems.childElementCount === 0) {
+        var carrito = document.getElementsByClassName('carrito')[0];
+        carrito.style.marginRight = '-100%';
+        carrito.style.opacity = '0';
+        carritoVisible = false;
+        document.getElementsByClassName('contenedor-items')[0].style.width = '100%';
+    }
+}
+
+function actualizarTotalCarrito() {
+    var carritoItems = document.getElementsByClassName('carrito-item');
+    var total = Array.from(carritoItems).reduce((sum, item) => {
+        var precio = parseFloat(item.getElementsByClassName('carrito-item-precio')[0].innerText.replace('$', '').replace('.', ''));
+        var cantidad = item.getElementsByClassName('carrito-item-cantidad')[0].value;
+        return sum + precio * cantidad;
+    }, 0);
+
+    document.getElementsByClassName('carrito-precio-total')[0].innerText = '$' + total.toLocaleString("es") + ",00";
+}
+
+var carritoVisible = false;
+
