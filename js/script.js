@@ -1,81 +1,98 @@
+const barraBusqueda = document.getElementById("busqueda");
+const productos = document.querySelectorAll(".contenedor-items .item");
+
+barraBusqueda.addEventListener("input", () => {
+    const filtro = barraBusqueda.value.toLowerCase();
+
+    productos.forEach((producto) => {
+        const titulo = producto.querySelector(".titulo-item").textContent.toLowerCase();
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', ready);
+        } else {
+            ready();
+        }
+    });
+});
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', ready);
 } else {
     ready();
 }
 
-async function ready() {
-    await cargarProductos(); 
+function ready() {
     cargarCarritoDesdeLocalStorage();
     configurarEventosBotones();
 }
 
-async function cargarProductos() {
-    try {
-        const response = await fetch('productos.json');
-        const productos = await response.json();
-        renderizarProductos(productos);
-    } catch (error) {
-        console.error('Error al cargar los productos:', error);
-    }
-}
-
-function renderizarProductos(productos) {
-    const contenedorItems = document.querySelector('.contenedor-items');
-    contenedorItems.innerHTML = ''; 
-
-    productos.forEach(producto => {
-        const itemHTML = `
-            <div class="item">
-                <span class="titulo-item">${producto.titulo}</span>
-                <img src="${producto.imagen}" alt="" class="img-item">
-                <span class="precio-item">$${producto.precio.toLocaleString('es')}</span>
-                <button class="boton-item" data-id="${producto.id}">Agregar al Carrito</button>
-            </div>
-        `;
-        contenedorItems.innerHTML += itemHTML;
-    });
-
-    configurarEventosBotones();
-}
-
 function configurarEventosBotones() {
-    const botonesAgregarAlCarrito = document.querySelectorAll('.boton-item');
-    botonesAgregarAlCarrito.forEach(boton =>
-        boton.addEventListener('click', agregarAlCarritoClicked)
-    );
+    var botonesEliminarItem = document.getElementsByClassName('btn-eliminar');
+    for (var boton of botonesEliminarItem) {
+        boton.addEventListener('click', eliminarItemCarrito);
+    }
+    
+    var botonesSumarCantidad = document.getElementsByClassName('sumar-cantidad');
+    for (var boton of botonesSumarCantidad) {
+        boton.addEventListener('click', sumarCantidad);
+    }
+    
+    var botonesRestarCantidad = document.getElementsByClassName('restar-cantidad');
+    for (var boton of botonesRestarCantidad) {
+        boton.addEventListener('click', restarCantidad);
+    }
+    
+    var botonesAgregarAlCarrito = document.getElementsByClassName('boton-item');
+    for (var boton of botonesAgregarAlCarrito) {
+        boton.addEventListener('click', agregarAlCarritoClicked);
+    }
 
-    document.querySelector('.btn-pagar').addEventListener('click', pagarClicked);
+    document.getElementsByClassName('btn-pagar')[0].addEventListener('click', pagarClicked);
 }
 
-async function agregarAlCarritoClicked(event) {
-    const boton = event.target;
-    const item = boton.parentElement;
-    const idProducto = boton.getAttribute('data-id');
-    const titulo = item.querySelector('.titulo-item').innerText;
-    const precio = parseInt(
-        item.querySelector('.precio-item').innerText.replace('$', '').replace('.', '')
-    );
-    const imagenSrc = item.querySelector('.img-item').src;
+function pagarClicked() {
+    var carritoItems = document.getElementsByClassName('carrito-items')[0];
+    while (carritoItems.hasChildNodes()) {
+        carritoItems.removeChild(carritoItems.firstChild);
+    }
+    actualizarTotalCarrito();
+    ocultarCarrito();
+    guardarCarritoEnLocalStorage();
+}
 
-    agregarItemAlCarrito(idProducto, titulo, precio, imagenSrc);
+const btnPagar = document.querySelector("#finalizarCarrito");
+
+btnPagar.addEventListener("click", () => {
+    Swal.fire({
+        text: 'Gracias por comprar en Euphoria Beauty!',
+        confirmButtonText: 'Aceptar',
+        iconHtml: '<i class="bi bi-emoji-smile-fill"></i>',
+        iconColor: '#f75a96'
+    });
+});
+
+function agregarAlCarritoClicked(event) {
+    var item = event.target.parentElement;
+    var titulo = item.getElementsByClassName('titulo-item')[0].innerText;
+    var precio = item.getElementsByClassName('precio-item')[0].innerText;
+    var imagenSrc = item.getElementsByClassName('img-item')[0].src;
+    
+    agregarItemAlCarrito(titulo, precio, imagenSrc);
     hacerVisibleCarrito();
     guardarCarritoEnLocalStorage();
 }
 
-function agregarItemAlCarrito(id, titulo, precio, imagenSrc) {
-    const itemsCarrito = document.querySelector('.carrito-items');
-    const idsItemsCarrito = Array.from(itemsCarrito.querySelectorAll('.carrito-item')).map(item =>
-        item.getAttribute('data-id')
-    );
+function agregarItemAlCarrito(titulo, precio, imagenSrc) {
+    var itemsCarrito = document.getElementsByClassName('carrito-items')[0];
+    var nombresItemsCarrito = itemsCarrito.getElementsByClassName('carrito-item-titulo');
 
-    if (idsItemsCarrito.includes(id)) {
-        Swal.fire('Atención', 'El item ya se encuentra en el carrito.', 'warning');
-        return;
+    for (var nombreItem of nombresItemsCarrito) {
+        if (nombreItem.innerText === titulo) {
+            return;
+        }
     }
 
-    const itemCarritoHTML = `
-        <div class="carrito-item" data-id="${id}">
+    var itemCarritoContenido = `
+        <div class="carrito-item">
             <img src="${imagenSrc}" width="80px" alt="">
             <div class="carrito-item-detalles">
                 <span class="carrito-item-titulo">${titulo}</span>
@@ -84,7 +101,7 @@ function agregarItemAlCarrito(id, titulo, precio, imagenSrc) {
                     <input type="text" value="1" class="carrito-item-cantidad" disabled>
                     <i class="fa-solid fa-plus sumar-cantidad"></i>
                 </div>
-                <span class="carrito-item-precio">$${precio.toLocaleString('es')}</span>
+                <span class="carrito-item-precio">${precio}</span>
             </div>
             <button class="btn-eliminar">
                 <i class="fa-solid fa-trash"></i>
@@ -92,113 +109,91 @@ function agregarItemAlCarrito(id, titulo, precio, imagenSrc) {
         </div>
     `;
 
-    const item = document.createElement('div');
-    item.innerHTML = itemCarritoHTML;
-    itemsCarrito.appendChild(item);
+    var item = document.createElement('div');
+    item.innerHTML = itemCarritoContenido;
+    itemsCarrito.append(item);
 
-    item.querySelector('.btn-eliminar').addEventListener('click', eliminarItemCarrito);
-    item.querySelector('.restar-cantidad').addEventListener('click', restarCantidad);
-    item.querySelector('.sumar-cantidad').addEventListener('click', sumarCantidad);
+    item.getElementsByClassName('btn-eliminar')[0].addEventListener('click', eliminarItemCarrito);
+    item.getElementsByClassName('restar-cantidad')[0].addEventListener('click', restarCantidad);
+    item.getElementsByClassName('sumar-cantidad')[0].addEventListener('click', sumarCantidad);
 
-    actualizarTotalCarrito();
-}
-
-function guardarCarritoEnLocalStorage() {
-    const carritoItems = document.querySelectorAll('.carrito-item');
-    const items = Array.from(carritoItems).map(item => ({
-        id: item.getAttribute('data-id'),
-        titulo: item.querySelector('.carrito-item-titulo').innerText,
-        precio: parseInt(
-            item.querySelector('.carrito-item-precio').innerText.replace('$', '').replace('.', '')
-        ),
-        imagenSrc: item.querySelector('img').src,
-        cantidad: parseInt(item.querySelector('.carrito-item-cantidad').value)
-    }));
-
-    localStorage.setItem('carrito', JSON.stringify(items));
-}
-
-function cargarCarritoDesdeLocalStorage() {
-    const items = JSON.parse(localStorage.getItem('carrito')) || [];
-    items.forEach(item => {
-        agregarItemAlCarrito(item.id, item.titulo, item.precio, item.imagenSrc);
-        const cantidades = document.querySelectorAll('.carrito-item-cantidad');
-        cantidades[cantidades.length - 1].value = item.cantidad;
-    });
-    actualizarTotalCarrito();
-}
-
-function eliminarItemCarrito(event) {
-    const item = event.target.closest('.carrito-item');
-    item.remove();
     actualizarTotalCarrito();
     guardarCarritoEnLocalStorage();
 }
 
+function guardarCarritoEnLocalStorage() {
+    var carritoItems = document.getElementsByClassName('carrito-item');
+    var items = Array.from(carritoItems).map(item => {
+        var titulo = item.getElementsByClassName('carrito-item-titulo')[0].innerText;
+        var precio = item.getElementsByClassName('carrito-item-precio')[0].innerText;
+        var imagenSrc = item.getElementsByTagName('img')[0].src;
+        var cantidad = item.getElementsByClassName('carrito-item-cantidad')[0].value;
+        return { titulo, precio, imagenSrc, cantidad };
+    });
+    localStorage.setItem('carrito', JSON.stringify(items));
+}
+
+function cargarCarritoDesdeLocalStorage() {
+    var items = JSON.parse(localStorage.getItem('carrito'));
+    if (items) {
+        items.forEach(item => {
+            agregarItemAlCarrito(item.titulo, item.precio, item.imagenSrc);
+            document.getElementsByClassName('carrito-item-cantidad')[document.getElementsByClassName('carrito-item-cantidad').length - 1].value = item.cantidad;
+        });
+        actualizarTotalCarrito();
+        hacerVisibleCarrito();
+    }
+}
+
 function sumarCantidad(event) {
-    const cantidad = event.target.parentElement.querySelector('.carrito-item-cantidad');
-    cantidad.value = parseInt(cantidad.value) + 1;
+    var cantidadActual = ++event.target.parentElement.getElementsByClassName('carrito-item-cantidad')[0].value;
     actualizarTotalCarrito();
     guardarCarritoEnLocalStorage();
 }
 
 function restarCantidad(event) {
-    const cantidad = event.target.parentElement.querySelector('.carrito-item-cantidad');
-    cantidad.value = Math.max(1, parseInt(cantidad.value) - 1);
+    var cantidadElemento = event.target.parentElement.getElementsByClassName('carrito-item-cantidad')[0];
+    var cantidadActual = --cantidadElemento.value;
+    if (cantidadActual < 1) cantidadElemento.value = 1;
     actualizarTotalCarrito();
     guardarCarritoEnLocalStorage();
 }
 
-function actualizarTotalCarrito() {
-    const carritoItems = document.querySelectorAll('.carrito-item');
-    const total = Array.from(carritoItems).reduce((sum, item) => {
-        const precio = parseInt(
-            item.querySelector('.carrito-item-precio').innerText.replace('$', '').replace('.', '')
-        );
-        const cantidad = parseInt(item.querySelector('.carrito-item-cantidad').value);
-        return sum + precio * cantidad;
-    }, 0);
-
-    document.querySelector('.carrito-precio-total').innerText =
-        '$' + total.toLocaleString('es') + ',00';
-}
-
-function pagarClicked() {
-    const carritoItems = document.querySelector('.carrito-items');
-    while (carritoItems.firstChild) {
-        carritoItems.removeChild(carritoItems.firstChild);
-    }
+function eliminarItemCarrito(event) {
+    event.target.parentElement.parentElement.remove();
     actualizarTotalCarrito();
     ocultarCarrito();
     guardarCarritoEnLocalStorage();
 }
 
-const btnPagar = document.querySelector("#finalizarCarrito")
-
-btnPagar.addEventListener("click", () =>{
-    Swal.fire({
-        text: 'Gracias por comprar en Euphoria Beauty!',
-        confirmButtonText: 'Aceptar',
-        iconHtml:'<i class="bi bi-emoji-smile-fill"></i>' ,
-        iconColor:'#f75a96'
-                })
-})
-
 function hacerVisibleCarrito() {
-    const carrito = document.querySelector('.carrito');
+    carritoVisible = true;
+    var carrito = document.getElementsByClassName('carrito')[0];
     carrito.style.marginRight = '0';
     carrito.style.opacity = '1';
-    document.querySelector('.contenedor-items').style.width = '60%';
+    document.getElementsByClassName('contenedor-items')[0].style.width = '60%';
 }
 
 function ocultarCarrito() {
-    const carritoItems = document.querySelector('.carrito-items');
-    if (!carritoItems.childElementCount) {
-        const carrito = document.querySelector('.carrito');
+    var carritoItems = document.getElementsByClassName('carrito-items')[0];
+    if (carritoItems.childElementCount === 0) {
+        var carrito = document.getElementsByClassName('carrito')[0];
         carrito.style.marginRight = '-100%';
         carrito.style.opacity = '0';
-        document.querySelector('.contenedor-items').style.width = '100%';
+        carritoVisible = false;
+        document.getElementsByClassName('contenedor-items')[0].style.width = '100%';
     }
 }
 
+function actualizarTotalCarrito() {
+    var carritoItems = document.getElementsByClassName('carrito-item');
+    var total = Array.from(carritoItems).reduce((sum, item) => {
+        var precio = parseFloat(item.getElementsByClassName('carrito-item-precio')[0].innerText.replace('$', '').replace('.', ''));
+        var cantidad = item.getElementsByClassName('carrito-item-cantidad')[0].value;
+        return sum + precio * cantidad;
+    }, 0);
 
+    document.getElementsByClassName('carrito-precio-total')[0].innerText = '$' + total.toLocaleString("es") + ",00";
+}
+
+var carritoVisible = false;

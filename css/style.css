@@ -284,7 +284,7 @@ h1 {
 
 .carrito{
     border: 1px solid #3d3a3a;
-    width: 30%;
+    width: 40%;
     margin-top: 30px;
     border-radius: 10px;
     overflow: hidden;
@@ -452,7 +452,7 @@ footer p {
 
 @media screen and (max-width: 850px) {
     .contenedor {
-      display: block;
+    display: block;
     }
     .contenedor-items{
         width: 100% !important;
@@ -460,4 +460,4 @@ footer p {
     .carrito{
         width: 100%;
     }
-  }
+}

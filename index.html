@@ -16,71 +16,75 @@
                 <img src="assets/logo.png" alt="Logo de Euphoria Beauty" class="logo">
             </a>
             <div class="navbar-search">
-                <input type="text" class="search-input" placeholder="Buscar">
                 <button class="search-btn">
                     <i class="fa-solid fa-search"></i>
                 </button>
+                <input id="busqueda" class="search-input" type="search" placeholder="Buscar producto..." />
+
             </div>
             <nav class="nav-links">  
                 <ul>
                     <li><a href="./pages/contacto.html"><i class="bi bi-person-fill icon-ingresar"></i> Ingresar</a></li>
                 </ul>
+            </nav>
+        </div>
     </header>
     <main>
+        <div class="contenedor-items"></div>
             <div class="container-home">
                 <h1>Bienvenidos a Euphoria Beauty</h1>
             </div>
     <section class="contenedor">
             <div class="contenedor-items">
-            <div class="item" id="1">
-                <span class="titulo-item">Sombra de ojos</span>
+            <div class="item" >
+                <span class="titulo-item">Sombra de Ojos</span>
                 <img src="assets/sombra.jpg" alt="" class="img-item">
                 <span class="precio-item">$30.000</span>
                 <button class="boton-item">Agregar al Carrito</button>
             </div>
-            <div class="item" id="2">
+            <div class="item">
                 <span class="titulo-item">Máscara</span>
                 <img src="assets/mascara.jpg" alt="" class="img-item">
                 <span class="precio-item">$20.000</span>
                 <button class="boton-item">Agregar al Carrito</button>
             </div>
-            <div class="item" id="3">
+            <div class="item">
                 <span class="titulo-item">Delineador</span>
                 <img src="assets/Delineador.jpg" alt="" class="img-item">
                 <span class="precio-item">$10.000</span>
                 <button class="boton-item">Agregar al Carrito</button>
             </div>
-            <div class="item" id="4">
+            <div class="item">
                 <span class="titulo-item">Labial Retráctil</span>
                 <img src="assets/labial retratil.jpg" alt="" class="img-item">
                 <span class="precio-item">$15.000</span>
                 <button class="boton-item">Agregar al Carrito</button>
             </div>
-            <div class="item" id="5">
+            <div class="item">
                 <span class="titulo-item">Labial Líquido</span>
                 <img src="assets/labial liquido.jpg" alt="" class="img-item">
                 <span class="precio-item">$20.000</span>
                 <button class="boton-item">Agregar al Carrito</button>
             </div>
-            <div class="item" id="6">
+            <div class="item">
                 <span class="titulo-item">Labial</span>
                 <img src="assets/labial.jpg" alt="" class="img-item">
                 <span class="precio-item">$18.000</span>
                 <button class="boton-item">Agregar al Carrito</button>
             </div>
-            <div class="item" id="7">
+            <div class="item">
                 <span class="titulo-item">Base</span>
                 <img src="assets/base.jpg" alt="" class="img-item">
                 <span class="precio-item">$25.000</span>
                 <button class="boton-item">Agregar al Carrito</button>
             </div>
-            <div class="item" id="8">
+            <div class="item">
                 <span class="titulo-item">Corrector</span>
                 <img src="assets/corrector.png" alt="" class="img-item">
                 <span class="precio-item">$16.000</span>
                 <button class="boton-item">Agregar al Carrito</button>
             </div>
-            <div class="item" id="9">
+            <div class="item">
                 <span class="titulo-item">Rubor</span>
                 <img src="assets/rubor.jpg" alt="" class="img-item">
                 <span class="precio-item">$20.000</span>
@@ -124,6 +128,7 @@
             <p>&copy; 2024 Todos los derechos reservados</p>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="./js/stock.json" async></script>
 <script src="js/script.js" async></script>
 </body>
 </html>
